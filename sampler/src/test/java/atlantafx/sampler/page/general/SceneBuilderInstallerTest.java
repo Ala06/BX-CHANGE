@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class SceneBuilderInstallerTest {
 
-    private static final Path INSTALL_DIR = Paths.get("/opt/scenebuilder");
+    private static final Path INSTALL_DIR = Paths.get("C:/users/alaab/AppData/Local/SceneBuilder/");
 
     //@Test
     public void testInstall() {

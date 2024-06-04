@@ -147,5 +147,10 @@ public final class NavTree extends TreeView<Nav> {
             Objects.requireNonNull(pageClass, "pageClass");
             return new Item(new Nav(title, null, pageClass, List.of(searchKeywords)));
         }
+        public static Item page(String title, @Nullable Node graphic, @Nullable Class<? extends Page> pageClass) {
+            Objects.requireNonNull(pageClass, "pageClass");
+            return new Item(new Nav(title, graphic, pageClass, Collections.emptyList()));
+        }
+
     }
 }

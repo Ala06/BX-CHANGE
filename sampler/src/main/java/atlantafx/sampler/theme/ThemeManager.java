@@ -49,7 +49,7 @@ public final class ThemeManager {
         Resources.resolve("assets/styles/index.css")
     };
     static final Set<Class<? extends Theme>> PROJECT_THEMES = Set.of(
-        PrimerLight.class, PrimerDark.class,
+            PrimerDark.class,PrimerLight.class,
         NordLight.class, NordDark.class,
         CupertinoLight.class, CupertinoDark.class,
         Dracula.class

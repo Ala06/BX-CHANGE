@@ -162,18 +162,8 @@ final class Sidebar extends VBox {
                 image.getFitHeight() + imageBorder.getRight() * 2
             );
 
-            var titleLbl = new Label("AtlantaFX");
-            titleLbl.getStyleClass().addAll(TITLE_3);
-            if (IS_DEV_MODE) {
-                var devLabel = new Label();
-                devLabel.setGraphic(new FontIcon(Material2OutlinedAL.INFO));
-                devLabel.getStyleClass().addAll("dev-indicator", Styles.WARNING);
-                devLabel.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-                devLabel.setTooltip(new Tooltip("App is running in development mode"));
+            var titleLbl = new Label("BX-CHANGE");
 
-                titleLbl.setContentDisplay(ContentDisplay.RIGHT);
-                titleLbl.setGraphic(devLabel);
-            }
 
             var themeSwitchBtn = new Button();
             themeSwitchBtn.getStyleClass().add("palette");

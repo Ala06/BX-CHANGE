@@ -4,6 +4,7 @@ package atlantafx.sampler;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import atlantafx.base.theme.PrimerDark;
 import atlantafx.sampler.event.BrowseEvent;
 import atlantafx.sampler.event.DefaultEventBus;
 import atlantafx.sampler.event.HotkeyEvent;
@@ -34,9 +35,7 @@ import javafx.stage.Stage;
 
 public class Launcher extends Application {
 
-    public static final boolean IS_DEV_MODE = "DEV".equalsIgnoreCase(
-        Resources.getPropertyOrEnv("atlantafx.mode", "ATLANTAFX_MODE")
-    );
+    public static final boolean IS_DEV_MODE = true;
 
     public static final List<KeyCodeCombination> SUPPORTED_HOTKEYS = List.of(
         new KeyCodeCombination(KeyCode.SLASH),
@@ -50,6 +49,8 @@ public class Launcher extends Application {
 
     @Override
     public void start(Stage stage) {
+        Application.setUserAgentStylesheet("/atlantafx/base/theme/primer-dark.css");
+
         Thread.currentThread().setUncaughtExceptionHandler(new DefaultExceptionHandler(stage));
         loadApplicationProperties();
 

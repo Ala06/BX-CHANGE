@@ -34,14 +34,10 @@ public final class ThemeRepository {
     private static final Comparator<SamplerTheme> THEME_COMPARATOR = Comparator.comparing(SamplerTheme::getName);
 
     private final List<SamplerTheme> internalThemes = Arrays.asList(
-        new SamplerTheme(new PrimerLight()),
         new SamplerTheme(new PrimerDark()),
-        new SamplerTheme(new NordLight()),
-        new SamplerTheme(new NordDark()),
-        new SamplerTheme(new CupertinoLight()),
-        new SamplerTheme(new CupertinoDark()),
-        new SamplerTheme(new Dracula())
-    );
+            new SamplerTheme(new PrimerLight())
+
+            );
 
     private final List<SamplerTheme> externalThemes = new ArrayList<>();
     private final Preferences themePreferences = Resources.getPreferences().node("theme");
