@@ -9,7 +9,6 @@ module atlantafx.sampler {
     requires javafx.swing;
     requires javafx.media;
     requires javafx.web;
-    requires javafx.fxml;
     requires jdk.zipfs;
 
     requires org.kordamp.ikonli.core;
@@ -20,6 +19,7 @@ module atlantafx.sampler {
 
     requires fr.brouillard.oss.cssfx;
     requires datafaker;
+    requires java.sql;
 
     exports atlantafx.sampler;
     exports atlantafx.sampler.fake.domain;

@@ -15,12 +15,17 @@ import fr.brouillard.oss.cssfx.CSSFX;
 import fr.brouillard.oss.cssfx.api.URIToPathConverter;
 import fr.brouillard.oss.cssfx.impl.log.CSSFXLogger;
 import fr.brouillard.oss.cssfx.impl.log.CSSFXLogger.LogLevel;
+
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.file.Paths;
+import java.sql.*;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.LogManager;
+
 import javafx.application.Application;
 import javafx.application.ConditionalFeature;
 import javafx.application.Platform;
@@ -35,6 +40,7 @@ import javafx.stage.Stage;
 
 public class Launcher extends Application {
 
+
     public static final boolean IS_DEV_MODE = true;
 
     public static final List<KeyCodeCombination> SUPPORTED_HOTKEYS = List.of(
@@ -44,6 +50,8 @@ public class Launcher extends Application {
     );
 
     public static void main(String[] args) {
+
+
         launch(args);
     }
 

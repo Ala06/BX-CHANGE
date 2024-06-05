@@ -8,66 +8,22 @@ import static atlantafx.sampler.layout.MainModel.SubLayer.SOURCE_CODE;
 import atlantafx.sampler.event.DefaultEventBus;
 import atlantafx.sampler.event.NavEvent;
 import atlantafx.sampler.page.Page;
-import atlantafx.sampler.page.components.AccordionPage;
-import atlantafx.sampler.page.components.BreadcrumbsPage;
-import atlantafx.sampler.page.components.ButtonPage;
-import atlantafx.sampler.page.components.CalendarPage;
-import atlantafx.sampler.page.components.CardPage;
-import atlantafx.sampler.page.components.ChartPage;
-import atlantafx.sampler.page.components.CheckBoxPage;
-import atlantafx.sampler.page.components.ChoiceBoxPage;
-import atlantafx.sampler.page.components.ColorPickerPage;
-import atlantafx.sampler.page.components.ComboBoxPage;
-import atlantafx.sampler.page.components.ContextMenuPage;
-import atlantafx.sampler.page.components.CustomTextFieldPage;
-import atlantafx.sampler.page.components.DatePickerPage;
-import atlantafx.sampler.page.components.DeckPanePage;
-import atlantafx.sampler.page.components.DialogPage;
-import atlantafx.sampler.page.components.HtmlEditorPage;
-import atlantafx.sampler.page.components.InputGroupPage;
-import atlantafx.sampler.page.components.ListViewPage;
-import atlantafx.sampler.page.components.MenuBarPage;
-import atlantafx.sampler.page.components.MenuButtonPage;
-import atlantafx.sampler.page.components.MessagePage;
-import atlantafx.sampler.page.components.ModalPanePage;
-import atlantafx.sampler.page.components.NotificationPage;
-import atlantafx.sampler.page.components.PaginationPage;
-import atlantafx.sampler.page.components.PopoverPage;
-import atlantafx.sampler.page.components.ProgressIndicatorPage;
-import atlantafx.sampler.page.components.RadioButtonPage;
-import atlantafx.sampler.page.components.ScrollPanePage;
-import atlantafx.sampler.page.components.SeparatorPage;
-import atlantafx.sampler.page.components.SliderPage;
-import atlantafx.sampler.page.components.SpinnerPage;
-import atlantafx.sampler.page.components.SplitPanePage;
-import atlantafx.sampler.page.components.TabPanePage;
-import atlantafx.sampler.page.components.TableViewPage;
-import atlantafx.sampler.page.components.TextAreaPage;
-import atlantafx.sampler.page.components.TextFieldPage;
-import atlantafx.sampler.page.components.TilePage;
-import atlantafx.sampler.page.components.TitledPanePage;
-import atlantafx.sampler.page.components.ToggleButtonPage;
-import atlantafx.sampler.page.components.ToggleSwitchPage;
-import atlantafx.sampler.page.components.ToolBarPage;
-import atlantafx.sampler.page.components.TooltipPage;
-import atlantafx.sampler.page.components.TreeTableViewPage;
-import atlantafx.sampler.page.components.TreeViewPage;
-import atlantafx.sampler.page.general.*;
-import atlantafx.sampler.page.showcase.BlueprintsPage;
-import atlantafx.sampler.page.showcase.OverviewPage;
-import atlantafx.sampler.page.showcase.filemanager.FileManagerPage;
-import atlantafx.sampler.page.showcase.musicplayer.MusicPlayerPage;
+
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import atlantafx.sampler.page.components.*;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.material2.Material2OutlinedAL;
 import org.kordamp.ikonli.material2.Material2OutlinedMZ;
 
 public class MainModel {
+
+
 
     public static final Class<? extends Page> DEFAULT_PAGE = DashboardPage.class;
 
@@ -119,13 +75,23 @@ public class MainModel {
 
     private NavTree.Item createTree() {
 
-        var dashboard = NavTree.Item.page("Dashboard", new FontIcon(Material2OutlinedMZ.SPEED), DashboardPage.class);
+        var dashboard = NavTree.Item.page("Dashboard", new FontIcon(Material2OutlinedMZ.MENU), DashboardPage.class);
+        var wallet = NavTree.Item.page("Wallet", new FontIcon(Material2OutlinedMZ.MONEY), WalletPage.class);
+        var watchlist = NavTree.Item.page("Watchlist", new FontIcon(Material2OutlinedMZ.PAGES), WatchlistPage.class);
+        var events = NavTree.Item.page("Events", new FontIcon(Material2OutlinedMZ.PAGEVIEW), EventsPage.class);
+        var xchange = NavTree.Item.page("X-Change", new FontIcon(Material2OutlinedMZ.PUBLISH), XChangePage.class);
+        var profile = NavTree.Item.page("Profile", new FontIcon(Material2OutlinedMZ.SETTINGS), ProfilePage.class);
 
 
 
         var root = NavTree.Item.root();
         root.getChildren().setAll(
-            dashboard
+            dashboard,
+                wallet,
+                watchlist,
+                events,
+                xchange,
+                profile
         );
 
         return root;
@@ -140,6 +106,11 @@ public class MainModel {
 
         // general
         map.put(DashboardPage.class, NavTree.Item.page(DashboardPage.NAME, DashboardPage.class));
+        map.put(WalletPage.class, NavTree.Item.page(WalletPage.NAME, WalletPage.class));
+        map.put(WatchlistPage.class, NavTree.Item.page(WatchlistPage.NAME, WatchlistPage.class));
+        map.put(EventsPage.class, NavTree.Item.page(EventsPage.NAME, EventsPage.class));
+        map.put(XChangePage.class, NavTree.Item.page(XChangePage.NAME, XChangePage.class));
+        map.put(ProfilePage.class, NavTree.Item.page(ProfilePage.NAME, ProfilePage.class));
 
         return map;
     }
