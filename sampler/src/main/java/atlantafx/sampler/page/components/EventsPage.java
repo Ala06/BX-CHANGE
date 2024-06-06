@@ -38,7 +38,7 @@ public class EventsPage extends OutlinePage {
     public EventsPage() {
         super();
         addPageHeader();
-        addSection("Latest Release", createAddEventSection());
+        addSection("Add an event", createAddEventSection());
         eventCardsBox = createEventCards();
         addSection("Events", eventCardsBox);
     }
