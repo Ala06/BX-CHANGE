@@ -12,6 +12,17 @@ public class Event {
     private String description;
     private int duration;
 
+    private String image;
+
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
     public int getEventId() {
         return eventId;
     }
@@ -52,11 +63,12 @@ public class Event {
         this.duration = duration;
     }
 
-    public Event(Date date, String title, String description, int duration) {
+    public Event(Date date, String title, String description, int duration,String image) {
         this.date = date;
         this.title = title;
         this.description = description;
         this.duration = duration;
+        this.image=image;
     }
 
     public Event() {

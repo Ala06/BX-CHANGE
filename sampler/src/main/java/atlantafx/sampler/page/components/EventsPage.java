@@ -10,6 +10,7 @@ import atlantafx.sampler.page.OutlinePage;
 import atlantafx.sampler.services.EventService;
 import atlantafx.sampler.services.serviceImpl.EventServiceImpl;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -58,24 +59,29 @@ public class EventsPage extends OutlinePage {
         TextField durationField = new TextField();
         durationField.setPromptText("Duration");
 
+        TextField imageField = new TextField();
+        imageField.setPromptText("Image URL");
+
         Button addButton = new Button("Add Event");
         addButton.setOnAction(e -> {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
             LocalDate localDate = LocalDate.parse(dateField.getText(), formatter);
 
             Event event = new Event(
-                    Date.valueOf(localDate), // Convert LocalDate to java.sql.Date
+                    Date.valueOf(localDate),
                     titleField.getText(),
                     descriptionField.getText(),
-                    Integer.parseInt(durationField.getText())
+                    Integer.parseInt(durationField.getText()),
+                    imageField.getText()
             );
             eventService.addEvent(event);
             refreshEventCards();
         });
 
-        addEventBox.getChildren().addAll(titleField, descriptionField, dateField, durationField, addButton);
+        addEventBox.getChildren().addAll(titleField, descriptionField, dateField, durationField, imageField, addButton);
         return addEventBox;
     }
+
 
 
     private VBox createEventCards() {
@@ -107,20 +113,25 @@ public class EventsPage extends OutlinePage {
         card.getStyleClass().add(Styles.ELEVATED_1);
         card.setMinWidth(200);
         card.setMaxWidth(200);
+        card.setMaxHeight(200);
 
         var header = new Tile(
-                event.getTitle(),
-                event.getDescription(),
-                new ImageView()
+                event.getTitle(), ""
+                ,new ImageView()
         );
         card.setHeader(header);
 
-        var image = new WritableImage(
-                new Image(
-                        Resources.getResourceAsStream("images/pattern.jpg")
-                ).getPixelReader(), 0, 0, 198, 100
-        );
-        card.setSubHeader(new ImageView(image));
+        var imageView = new ImageView();
+        if (event.getImage() != null && !event.getImage().isEmpty()) {
+            imageView.setImage(new Image(event.getImage()));
+            imageView.setFitWidth(180);
+            imageView.setFitHeight(150);
+            imageView.setPreserveRatio(true);
+        }
+
+        HBox imageBox = new HBox(imageView);
+        imageBox.setAlignment(Pos.CENTER);
+        card.setSubHeader(imageBox);
 
         var text = new TextFlow(new Text(event.getDescription() + "\n" + event.getDate().toString()));
         text.setMaxWidth(180);
@@ -133,11 +144,14 @@ public class EventsPage extends OutlinePage {
         });
 
         VBox cardContent = new VBox(text, deleteButton);
-        cardContent.setSpacing(10);
+        cardContent.setSpacing(5);
+        cardContent.setPadding(new Insets(5));
         card.setBody(cardContent);
 
         return card;
     }
+
+
 
     private void refreshEventCards() {
         eventCardsBox.getChildren().clear();

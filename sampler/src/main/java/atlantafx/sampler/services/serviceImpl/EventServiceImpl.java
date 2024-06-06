@@ -47,7 +47,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void addEvent(Event event) {
-        String sql = "INSERT INTO events (date, title, description, duration) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO events (date, title, description, duration, image) VALUES (?, ?, ?, ?,?)";
 
         try (Connection connection = DBManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -56,6 +56,8 @@ public class EventServiceImpl implements EventService {
             preparedStatement.setString(2, event.getTitle());
             preparedStatement.setString(3, event.getDescription());
             preparedStatement.setInt(4, event.getDuration());
+            preparedStatement.setString(5, event.getImage());
+
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -101,6 +103,7 @@ public class EventServiceImpl implements EventService {
         event.setTitle(resultSet.getString("title"));
         event.setDescription(resultSet.getString("description"));
         event.setDuration(resultSet.getInt("duration"));
+        event.setImage(resultSet.getString("image"));
         return event;
     }
 }
