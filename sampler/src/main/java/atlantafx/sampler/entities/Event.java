@@ -1,12 +1,15 @@
 package atlantafx.sampler.entities;
 
 
+import org.intellij.lang.annotations.PrintFormat;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
 public class Event {
     private int eventId;
+
     private Date date;
     private String title;
     private String description;

@@ -5,17 +5,17 @@ import atlantafx.base.controls.Tile;
 import atlantafx.base.theme.Styles;
 import atlantafx.sampler.Resources;
 import atlantafx.sampler.entities.Event;
+import atlantafx.sampler.page.ExampleBox;
 import atlantafx.sampler.page.OutlinePage;
 
+import atlantafx.sampler.page.Snippet;
 import atlantafx.sampler.services.EventService;
 import atlantafx.sampler.services.serviceImpl.EventServiceImpl;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -28,19 +28,30 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class EventsPage extends OutlinePage {
 
     public static final String NAME = "Events";
     private final EventService eventService = new EventServiceImpl();
     private VBox eventCardsBox;
+    private TextField searchField;
 
     public EventsPage() {
         super();
         addPageHeader();
         addSection("Add an event", createAddEventSection());
-        eventCardsBox = createEventCards();
+        searchField = createSearchField();
+        addSection("Search Events", searchField);
+        eventCardsBox = createEventCards("");
         addSection("Events", eventCardsBox);
+    }
+
+    private TextField createSearchField() {
+        TextField searchField = new TextField();
+        searchField.setPromptText("Search events...");
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> refreshEventCards(newValue));
+        return searchField;
     }
 
     private VBox createAddEventSection() {
@@ -75,20 +86,22 @@ public class EventsPage extends OutlinePage {
                     imageField.getText()
             );
             eventService.addEvent(event);
-            refreshEventCards();
+            refreshEventCards(searchField.getText());
         });
 
         addEventBox.getChildren().addAll(titleField, descriptionField, dateField, durationField, imageField, addButton);
         return addEventBox;
     }
 
-
-
-    private VBox createEventCards() {
+    private VBox createEventCards(String filter) {
         VBox vbox = new VBox();
         vbox.setSpacing(20);
 
-        List<Event> events = eventService.getAllEvents();
+        List<Event> events = eventService.getAllEvents().stream()
+                .filter(event -> event.getTitle().toLowerCase().contains(filter.toLowerCase()) ||
+                        event.getDescription().toLowerCase().contains(filter.toLowerCase()))
+                .collect(Collectors.toList());
+
         GridPane gridPane = new GridPane();
         gridPane.setHgap(20);
         gridPane.setVgap(20);
@@ -115,10 +128,7 @@ public class EventsPage extends OutlinePage {
         card.setMaxWidth(200);
         card.setMaxHeight(200);
 
-        var header = new Tile(
-                event.getTitle(), ""
-                ,new ImageView()
-        );
+        var header = new Tile(event.getTitle(), "", new ImageView());
         card.setHeader(header);
 
         var imageView = new ImageView();
@@ -140,10 +150,13 @@ public class EventsPage extends OutlinePage {
         Button deleteButton = new Button("Delete");
         deleteButton.setOnAction(e -> {
             eventService.deleteEvent(event.getEventId());
-            refreshEventCards();
+            refreshEventCards(searchField.getText());
         });
 
-        VBox cardContent = new VBox(text, deleteButton);
+        Button updateButton = new Button("Update");
+        updateButton.setOnAction(e -> showUpdateDialog(event));
+
+        VBox cardContent = new VBox(text, deleteButton, updateButton);
         cardContent.setSpacing(5);
         cardContent.setPadding(new Insets(5));
         card.setBody(cardContent);
@@ -151,11 +164,56 @@ public class EventsPage extends OutlinePage {
         return card;
     }
 
+    private void showUpdateDialog(Event event) {
+        var dialog = new Dialog<ButtonType>();
+        dialog.setTitle("Update Event");
+        dialog.setHeaderText("Update the details of the event:");
 
+        TextField titleField = new TextField(event.getTitle());
+        titleField.setPromptText("Title");
 
-    private void refreshEventCards() {
+        TextField descriptionField = new TextField(event.getDescription());
+        descriptionField.setPromptText("Description");
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(event.getDate().toString(), formatter);
+        TextField dateField = new TextField(localDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+        dateField.setPromptText("Date (DD-MM-YYYY)");
+
+        TextField durationField = new TextField(String.valueOf(event.getDuration()));
+        durationField.setPromptText("Duration");
+
+        TextField imageField = new TextField(event.getImage());
+        imageField.setPromptText("Image URL");
+
+        VBox dialogContent = new VBox();
+        dialogContent.setSpacing(10);
+        dialogContent.getChildren().addAll(titleField, descriptionField, dateField, durationField, imageField);
+        dialog.getDialogPane().setContent(dialogContent);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        dialog.initOwner(getScene().getWindow());
+
+        dialog.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                event.setTitle(titleField.getText());
+                event.setDescription(descriptionField.getText());
+
+                DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+                LocalDate newLocalDate = LocalDate.parse(dateField.getText(), inputFormatter);
+                event.setDate(Date.valueOf(newLocalDate));
+
+                event.setDuration(Integer.parseInt(durationField.getText()));
+                event.setImage(imageField.getText());
+
+                eventService.updateEvent(event);
+                refreshEventCards(searchField.getText());
+            }
+        });
+    }
+
+    private void refreshEventCards(String filter) {
         eventCardsBox.getChildren().clear();
-        eventCardsBox.getChildren().add(createEventCards());
+        eventCardsBox.getChildren().add(createEventCards(filter));
     }
 
     @Override
