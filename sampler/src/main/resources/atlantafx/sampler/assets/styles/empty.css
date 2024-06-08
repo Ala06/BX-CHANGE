@@ -1,1 +1,37 @@
-/* This is dummy file to clear user agent stylesheet. */
+.message-bubble {
+    -fx-background-color: #2DC24E; /* Updated background color */
+    -fx-background-radius: 15;
+    -fx-border-radius: 15;
+    -fx-padding: 10;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0.0, 0, 1);
+}
+
+.message-text {
+    -fx-font-size: 14px;
+    -fx-fill: black; /* Text color set to black */
+}
+
+.message-date {
+    -fx-font-size: 16px;
+    -fx-fill: #888;
+}
+
+.bottom-container {
+    -fx-alignment: bottom-left; /* Aligns the date to the bottom left */
+    -fx-spacing: 5;
+}
+
+.right-container .button {
+    -fx-background-color: #ff4d4d;
+    -fx-text-fill: white;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 5 10;
+    -fx-font-size: 12px;
+}
+
+.right-container {
+    -fx-alignment: top-right; /* Aligns the buttons to the top right */
+    -fx-spacing: 5;
+}
+
