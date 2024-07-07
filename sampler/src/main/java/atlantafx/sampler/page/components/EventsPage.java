@@ -23,10 +23,14 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import org.jetbrains.annotations.Nullable;
 
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,37 +65,131 @@ public class EventsPage extends OutlinePage {
         TextField titleField = new TextField();
         titleField.setPromptText("Title");
 
+        Label titleLabel = new Label();
+        titleLabel.setStyle("-fx-text-fill: red");
+
         TextField descriptionField = new TextField();
         descriptionField.setPromptText("Description");
+
+        Label descriptionLabel = new Label();
+        descriptionLabel.setStyle("-fx-text-fill: red");
 
         TextField dateField = new TextField();
         dateField.setPromptText("Date (DD-MM-YYYY)");
 
+        Label dateLabel = new Label();
+        dateLabel.setStyle("-fx-text-fill: red");
+
         TextField durationField = new TextField();
         durationField.setPromptText("Duration");
+
+        Label durationLabel = new Label();
+        durationLabel.setStyle("-fx-text-fill: red");
 
         TextField imageField = new TextField();
         imageField.setPromptText("Image URL");
 
+        Label imageLabel = new Label();
+        imageLabel.setStyle("-fx-text-fill: red");
+
+        Label successLabel = new Label();
+        successLabel.setStyle("-fx-text-fill: green");
+
         Button addButton = new Button("Add Event");
         addButton.setOnAction(e -> {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-            LocalDate localDate = LocalDate.parse(dateField.getText(), formatter);
+            boolean isValid = true;
 
-            Event event = new Event(
-                    Date.valueOf(localDate),
-                    titleField.getText(),
-                    descriptionField.getText(),
-                    Integer.parseInt(durationField.getText()),
-                    imageField.getText()
-            );
-            eventService.addEvent(event);
-            refreshEventCards(searchField.getText());
+            // Validate title
+            if (titleField.getText().isEmpty()) {
+                titleLabel.setText("Title cannot be empty");
+                isValid = false;
+            } else {
+                titleLabel.setText("");
+            }
+
+            // Validate description
+            if (descriptionField.getText().isEmpty()) {
+                descriptionLabel.setText("Description cannot be empty");
+                isValid = false;
+            } else {
+                descriptionLabel.setText("");
+            }
+
+            // Validate date
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            try {
+                LocalDate localDate = LocalDate.parse(dateField.getText(), formatter);
+                dateLabel.setText("");
+            } catch (DateTimeParseException ex) {
+                dateLabel.setText("Invalid date format (DD-MM-YYYY)");
+                isValid = false;
+            }
+
+            // Validate duration (assuming it's an integer)
+            try {
+                if (!durationField.getText().matches("\\d+")) {
+                    durationLabel.setText("Duration must be a number");
+                    isValid = false;
+                } else {
+                    durationLabel.setText("");
+                }
+            } catch (NumberFormatException ex) {
+                durationLabel.setText("Invalid duration format");
+                isValid = false;
+            }
+
+            // Validate image URL (optional)
+            if (!imageField.getText().isEmpty() && !isValidURL(imageField.getText())) {
+                imageLabel.setText("Invalid image URL");
+                isValid = false;
+            } else {
+                imageLabel.setText("");
+            }
+
+            // If all fields are valid, proceed to add the event
+            if (isValid) {
+                Event event = new Event(
+                        Date.valueOf(LocalDate.parse(dateField.getText(), formatter)),
+                        titleField.getText(),
+                        descriptionField.getText(),
+                        Integer.parseInt(durationField.getText()),
+                        imageField.getText()
+                );
+                eventService.addEvent(event);
+                refreshEventCards(searchField.getText());
+
+                // Reset fields and show success message
+                titleField.clear();
+                descriptionField.clear();
+                dateField.clear();
+                durationField.clear();
+                imageField.clear();
+                successLabel.setText("Event added successfully!");
+            }
         });
 
-        addEventBox.getChildren().addAll(titleField, descriptionField, dateField, durationField, imageField, addButton);
+        addEventBox.getChildren().addAll(
+                titleField, titleLabel,
+                descriptionField, descriptionLabel,
+                dateField, dateLabel,
+                durationField, durationLabel,
+                imageField, imageLabel,
+                addButton,
+                successLabel
+        );
         return addEventBox;
     }
+
+    private boolean isValidURL(String url) {
+        try {
+            new URL(url).toURI();
+            return true;
+        } catch (MalformedURLException | URISyntaxException e) {
+            return false;
+        }
+    }
+
+
 
     private VBox createEventCards(String filter) {
         VBox vbox = new VBox();

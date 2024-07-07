@@ -82,4 +82,26 @@ public class EventFollowerServiceImpl implements EventFollowerService {
         int userId = resultSet.getInt("userId");
         return new EventFollower(eventId, userId);
     }
+
+    @Override
+    public List<EventFollower> getEventFollowersByEventId(int eventId) {
+        List<EventFollower> eventFollowers = new ArrayList<>();
+        String sql = "SELECT * FROM event_followers WHERE eventId = ?";
+        try (Connection connection = DBManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, eventId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                EventFollower eventFollower = new EventFollower(
+                        resultSet.getInt("eventId"),
+                        resultSet.getInt("userId")
+                );
+                eventFollowers.add(eventFollower);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return eventFollowers;
+    }
+
 }

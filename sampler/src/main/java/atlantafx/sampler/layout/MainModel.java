@@ -79,6 +79,7 @@ public class MainModel {
         var wallet = NavTree.Item.page("Wallet", new FontIcon(Material2OutlinedMZ.MONEY), WalletPage.class);
         var watchlist = NavTree.Item.page("Watchlist", new FontIcon(Material2OutlinedMZ.PAGES), WatchlistPage.class);
         var events = NavTree.Item.page("Events", new FontIcon(Material2OutlinedMZ.PAGEVIEW), EventsPage.class);
+        var UserEvents = NavTree.Item.page("Events", new FontIcon(Material2OutlinedMZ.PAGEVIEW), UserEventsPage.class);
         var xchange = NavTree.Item.page("X-Change", new FontIcon(Material2OutlinedMZ.PUBLISH), XChangePage.class);
         var profile = NavTree.Item.page("Profile", new FontIcon(Material2OutlinedMZ.SETTINGS), ProfilePage.class);
 
@@ -90,6 +91,7 @@ public class MainModel {
                 wallet,
                 watchlist,
                 events,
+                UserEvents,
                 xchange,
                 profile
         );
@@ -109,6 +111,8 @@ public class MainModel {
         map.put(WalletPage.class, NavTree.Item.page(WalletPage.NAME, WalletPage.class));
         map.put(WatchlistPage.class, NavTree.Item.page(WatchlistPage.NAME, WatchlistPage.class));
         map.put(EventsPage.class, NavTree.Item.page(EventsPage.NAME, EventsPage.class));
+        map.put(UserEventsPage.class, NavTree.Item.page(EventsPage.NAME, UserEventsPage.class));
+
         map.put(XChangePage.class, NavTree.Item.page(XChangePage.NAME, XChangePage.class));
         map.put(ProfilePage.class, NavTree.Item.page(ProfilePage.NAME, ProfilePage.class));
 
