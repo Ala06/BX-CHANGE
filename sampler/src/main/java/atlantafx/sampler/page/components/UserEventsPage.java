@@ -47,7 +47,7 @@ public class UserEventsPage extends OutlinePage {
 
     // Twilio configuration
     private static final String ACCOUNT_SID = "ACb04bca00e387f13769b60a8cd6489895";
-    private static final String AUTH_TOKEN = "1bf08050cc1b49121cd1f341f0bb289f";
+    private static final String AUTH_TOKEN = "0f3da267168a6c2954c6a0a15804161d";
     private static final String FROM_PHONE_NUMBER = "+15626208381";
     private static final String TO_PHONE_NUMBER = "+21628780277";
 
