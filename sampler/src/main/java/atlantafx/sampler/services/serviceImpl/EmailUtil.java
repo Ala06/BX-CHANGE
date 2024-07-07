@@ -12,8 +12,8 @@ import java.io.IOException;
 
 public class EmailUtil {
 
-    private static final String MJ_APIKEY_PUBLIC = "ddb067428c5ea61e17c65fe5c793ea4a"; // Replace with your Mailjet public API key
-    private static final String MJ_APIKEY_PRIVATE = "d9907645444051b5649c879c5e5fd4db"; // Replace with your Mailjet private API key
+    private static final String MJ_APIKEY_PUBLIC = "ddb067428c5ea61e17c65fe5c793ea4a";
+    private static final String MJ_APIKEY_PRIVATE = "d9907645444051b5649c879c5e5fd4db";
 
     public static void sendEmail(String toAddress, String subject, String message) throws IOException {
         MailjetClient client = new MailjetClient(MJ_APIKEY_PUBLIC, MJ_APIKEY_PRIVATE);
