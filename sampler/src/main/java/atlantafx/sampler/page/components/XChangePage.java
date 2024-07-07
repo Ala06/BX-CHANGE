@@ -1,40 +1,100 @@
 package atlantafx.sampler.page.components;
 
-import atlantafx.base.theme.Styles;
+import atlantafx.sampler.entities.Discussions;
 import atlantafx.sampler.entities.Messages;
+import atlantafx.sampler.entities.User;
 import atlantafx.sampler.page.OutlinePage;
+import atlantafx.sampler.services.DiscussionService;
 import atlantafx.sampler.services.MessageService;
+import atlantafx.sampler.services.UserService;
+import atlantafx.sampler.services.serviceImpl.DiscussionServiceImpl;
 import atlantafx.sampler.services.serviceImpl.MessageServiceImpl;
+import atlantafx.sampler.services.serviceImpl.UserServiceImpl;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Stage;
 import org.jetbrains.annotations.Nullable;
-import org.kordamp.ikonli.feather.Feather;
-import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.awt.*;
 import java.net.URI;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class XChangePage extends OutlinePage {
-    public static final String NAME = "X-Change";
+  /*  public static final String NAME = "X-Change";
     private final MessageService messageService = new MessageServiceImpl();
+    private final UserService userService = new UserServiceImpl();
+    private final DiscussionService discussionService = new DiscussionServiceImpl();
     private VBox messageCardsBox;
     private TextField searchField;
+    private User selectedUser;
+    private VBox discussionsBox;
+    private Discussions currentDiscussion;
 
     public XChangePage() {
         super();
         addPageHeader();
-        addSection("Discussion", createMessageSection());
+        addSection("Users", createUserListSection());
+        addSection("Discussions", createDiscussionsSection());
+        addSection("Messages", createMessageSection());
+    }
+
+    private VBox createUserListSection() {
+        VBox userListBox = new VBox();
+        userListBox.setSpacing(10);
+        ScrollPane scrollPane = new ScrollPane(userListBox);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+
+        List<User> users = userService.getAllUsers();
+        for (User user : users) {
+            Button userButton = new Button(user.getUserName());
+            userButton.setOnAction(e -> {
+                selectedUser = user;
+                System.out.println("Selected user: " + selectedUser.getUserName());
+                refreshDiscussions();
+            });
+            userListBox.getChildren().add(userButton);
+        }
+
+        VBox container = new VBox();
+        container.setSpacing(10);
+        container.getChildren().addAll(scrollPane);
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+
+        return container;
+    }
+
+    private VBox createDiscussionsSection() {
+        discussionsBox = new VBox();
+        discussionsBox.setSpacing(10);
+        ScrollPane scrollPane = new ScrollPane(discussionsBox);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+
+        VBox container = new VBox();
+        container.setSpacing(10);
+        container.getChildren().addAll(scrollPane);
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+
+        return container;
     }
 
     private VBox createMessageSection() {
@@ -81,103 +141,209 @@ public class XChangePage extends OutlinePage {
 
         Button addButton = new Button("Send");
         addButton.setOnAction(e -> {
-            Messages message = new Messages();
-            message.setDate(Date.valueOf(LocalDate.now()));
-            message.setContent(contentField.getText());
-
-            messageService.addMessage(message);
-            refreshMessageCards();
-            contentField.clear();
+            if (currentDiscussion != null && selectedUser != null) {
+                Messages newMessage = new Messages();
+                newMessage.setDate(Date.valueOf(LocalDate.now()));
+                newMessage.setContent(contentField.getText());
+                newMessage.setDiscussionId(currentDiscussion.getDiscussionId());
+                newMessage.setAuthor(1); // Assuming user ID 1 for the author for now
+                messageService.addMessage(newMessage);
+                contentField.clear();
+                refreshMessageCards();
+            }
         });
 
-        Button addVideoButton = new Button(null, new FontIcon(Feather.VIDEO));
-        addVideoButton.getStyleClass().addAll(Styles.BUTTON_ICON, Styles.LEFT_PILL);
-        addVideoButton.setOnAction(e -> {
-            // Add logic to handle adding a video message
-        });
-
-        Button addPhotoButton = new Button(null, new FontIcon(Feather.IMAGE));
-        addPhotoButton.getStyleClass().addAll(Styles.BUTTON_ICON);
-        addPhotoButton.setOnAction(e -> {
-            // Add logic to handle adding a photo message
-        });
-
-        Button addVoiceButton = new Button(null, new FontIcon(Feather.MIC));
-        addVoiceButton.getStyleClass().addAll(Styles.BUTTON_ICON, Styles.RIGHT_PILL);
-        addVoiceButton.setOnAction(e -> {
-            // Add logic to handle adding a voice message
-        });
-
-        addMessageBox.getChildren().addAll(addVideoButton, addPhotoButton, addVoiceButton, contentField, addButton);
+        addMessageBox.getChildren().addAll(contentField, addButton);
         return addMessageBox;
     }
 
     private void refreshMessageCards() {
         messageCardsBox.getChildren().clear();
+
         List<Messages> messages;
-        if (searchField != null && !searchField.getText().isEmpty()) {
-            messages = messageService.searchMessagesByText(searchField.getText());
+        if (searchField.getText().isEmpty()) {
+            messages = currentDiscussion == null ? List.of() : messageService.getMessagesByDiscussionId(currentDiscussion.getDiscussionId());
         } else {
-            messages = messageService.getAllMessages();
+            messages = messageService.searchMessagesByText(searchField.getText());
         }
 
         for (Messages message : messages) {
-            messageCardsBox.getChildren().add(createMessageBubble(message));
+            TextFlow messageCard = new TextFlow(new Text(message.getContent()));
+            messageCard.setPadding(new Insets(10));
+            messageCard.getStyleClass().add("message-card");
+            messageCardsBox.getChildren().add(messageCard);
         }
     }
-    private HBox createMessageBubble(Messages message) {
-        HBox messageBubble = new HBox();
-        messageBubble.setSpacing(10);
-        messageBubble.setPadding(new Insets(10));
-        messageBubble.getStyleClass().add("message-bubble");
 
-        TextFlow textFlow = new TextFlow();
-        textFlow.getChildren().add(new Text(message.getContent()));
-        textFlow.setPadding(new Insets(10));
-        textFlow.getStyleClass().add("message-text");
+    private void refreshDiscussions() {
+        discussionsBox.getChildren().clear();
+        if (selectedUser != null) {
+            List<Discussions> discussions = discussionService.getDiscussionsByUserId(selectedUser.getUserId());
+            for (Discussions discussion : discussions) {
+                Button discussionButton = new Button("Discussion with " + selectedUser.getUserName());
+                discussionButton.setOnAction(e -> {
+                    currentDiscussion = discussion;
+                    refreshMessageCards();
+                });
+                discussionsBox.getChildren().add(discussionButton);
+            }
+        }
+    }*/
+  public static final String NAME = "X-Change";
 
-        Text dateText = new Text(message.getDate().toString());
-        dateText.getStyleClass().add("message-date");
+    private final UserService userService = new UserServiceImpl();
+    private final DiscussionService discussionService = new DiscussionServiceImpl();
+    private final MessageService messageService = new MessageServiceImpl();
 
-        Button updateButton = new Button(null, new FontIcon(Feather.PEN_TOOL));
-        updateButton.getStyleClass().addAll(Styles.BUTTON_CIRCLE, Styles.ACCENT);
-        updateButton.setOnAction(e -> {
-            TextInputDialog dialog = new TextInputDialog(message.getContent());
-            dialog.setTitle("Edit Message");
-            dialog.setHeaderText(null);
-            dialog.setContentText("Edit the message:");
-            dialog.initOwner(getScene().getWindow());
-            Optional<String> result = dialog.showAndWait();
-            result.ifPresent(updatedContent -> {
-                Messages updatedMessage = new Messages();
-                updatedMessage.setMessageId(message.getMessageId());
-                updatedMessage.setDate(message.getDate());
-                updatedMessage.setContent(updatedContent);
-                messageService.updateMessage(updatedMessage);
-                refreshMessageCards();
-            });
-        });
+    private final User currentUser = new User(5, "salma");
+    private User selectedUser;
+    private Discussions currentDiscussion;
 
-        Button deleteButton = new Button(null, new FontIcon(Feather.TRASH));
-        deleteButton.getStyleClass().addAll(Styles.BUTTON_CIRCLE, Styles.BUTTON_OUTLINED, Styles.DANGER);
-        deleteButton.setOnAction(e -> {
-            messageService.deleteMessage(message.getMessageId());
-            refreshMessageCards();
-        });
+    private VBox messageCardsBox;
+    private TextField searchField;
+    private HBox inputBox;
 
-        HBox rightContainer = new HBox(updateButton, deleteButton);
-        rightContainer.setSpacing(5);
-        rightContainer.getStyleClass().add("right-container");
+    public XChangePage() {
+        super();
 
-        VBox bottomContainer = new VBox(rightContainer, dateText);
-        bottomContainer.setSpacing(5);
-        bottomContainer.getStyleClass().add("bottom-container");
+        BorderPane root = new BorderPane();
+        root.setPadding(new Insets(10));
 
-        HBox.setHgrow(textFlow, Priority.ALWAYS);
-        messageBubble.getChildren().addAll(textFlow, bottomContainer);
-        return messageBubble;
+        root.setRight(createUserListSection());
+        root.setCenter(createMessageSection());
+
+        scrollPane.setContent(root);
     }
 
+    public void start(Stage primaryStage) {
+        BorderPane root = new BorderPane();
+        root.setPadding(new Insets(10));
+
+        root.setRight(createUserListSection());
+        root.setCenter(createMessageSection());
+
+        Scene scene = new Scene(root, 300, 600); // Adjust the width and height
+        primaryStage.setScene(scene);
+        primaryStage.setTitle(NAME);
+        primaryStage.show();
+    }
+
+    private VBox createUserListSection() {
+        VBox userListBox = new VBox();
+        userListBox.setSpacing(10);
+        ScrollPane scrollPane = new ScrollPane(userListBox);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+
+        List<User> users = userService.getAllUsers();
+        for (User user : users) {
+            if (user.getUserId() != currentUser.getUserId()) { // Exclude current user from list
+                Button userButton = new Button(user.getUserName());
+                userButton.setOnAction(e -> {
+                    selectedUser = user;
+                    currentDiscussion = discussionService.findOrCreateDiscussion(currentUser.getUserId(), selectedUser.getUserId());
+                    refreshMessages();
+                    inputBox.setVisible(true);
+                });
+                userListBox.getChildren().add(userButton);
+            }
+        }
+
+        VBox container = new VBox();
+        container.setSpacing(10);
+        container.getChildren().addAll(new Label("Users"), scrollPane);
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+
+        return container;
+    }
+
+    private VBox createMessageSection() {
+        VBox messageBox = new VBox();
+        messageBox.setSpacing(10);
+
+        searchField = new TextField();
+        searchField.setPromptText("Search messages...");
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> refreshMessages());
+
+        messageCardsBox = new VBox();
+        messageCardsBox.setSpacing(8);
+        ScrollPane scrollPane = new ScrollPane(messageCardsBox);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+
+        inputBox = new HBox();
+        inputBox.setSpacing(10);
+        inputBox.setPadding(new Insets(10));
+        inputBox.setVisible(false);
+
+        TextField messageInput = new TextField();
+        messageInput.setPromptText("Type your message here...");
+        HBox.setHgrow(messageInput, Priority.ALWAYS);
+
+        Button sendButton = new Button("Send");
+        sendButton.setOnAction(e -> {
+            if (currentDiscussion != null && selectedUser != null && !messageInput.getText().isEmpty()) {
+                Messages newMessage = new Messages();
+                newMessage.setDate(Date.valueOf(LocalDate.now()));
+                newMessage.setContent(messageInput.getText());
+                newMessage.setDiscussionId(currentDiscussion.getDiscussionId());
+                newMessage.setAuthor(currentUser.getUserId());
+                newMessage.setReceiver(selectedUser.getUserId());
+                messageService.addMessage(newMessage);
+                messageInput.clear();
+                refreshMessages();
+            }
+        });
+
+        inputBox.getChildren().addAll(messageInput, sendButton);
+
+        messageBox.getChildren().addAll(new Label("Messages"), searchField, scrollPane, inputBox);
+
+        return messageBox;
+    }
+
+    private void refreshMessages() {
+        messageCardsBox.getChildren().clear();
+        List<Messages> messages;
+        if (currentDiscussion != null) {
+            messages = messageService.getMessagesByDiscussionId(currentDiscussion.getDiscussionId());
+            if (!searchField.getText().isEmpty()) {
+                messages.removeIf(message -> !message.getContent().contains(searchField.getText()));
+            }
+        } else {
+            messages = List.of();
+        }
+        for (Messages message : messages) {
+            HBox messageBox = new HBox();
+            messageBox.setSpacing(10);
+            messageBox.setPadding(new Insets(10));
+
+            TextFlow messageFlow = new TextFlow(new Text(message.getContent()));
+            Button editButton = new Button("Edit");
+            Button deleteButton = new Button("Delete");
+
+            editButton.setOnAction(e -> {
+                TextField editField = new TextField(message.getContent());
+                Button saveButton = new Button("Save");
+                saveButton.setOnAction(saveEvent -> {
+                    message.setContent(editField.getText());
+                    messageService.updateMessage(message);
+                    refreshMessages();
+                });
+                messageBox.getChildren().setAll(editField, saveButton);
+            });
+
+            deleteButton.setOnAction(e -> {
+                messageService.deleteMessage(message.getMessageId());
+                refreshMessages();
+            });
+
+            messageBox.getChildren().addAll(messageFlow, editButton, deleteButton);
+            messageCardsBox.getChildren().add(messageBox);
+        }
+    }
 
     @Override
     public String getName() {
