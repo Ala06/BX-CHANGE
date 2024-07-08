@@ -16,19 +16,11 @@ module atlantafx.sampler {
     requires org.kordamp.ikonli.feather;
     requires org.kordamp.ikonli.material2;
     requires org.jetbrains.annotations;
-    exports atlantafx.sampler.services.serviceImpl to quartz;
+
     requires fr.brouillard.oss.cssfx;
     requires datafaker;
     requires java.sql;
-    requires twilio;
-    requires com.fasterxml.jackson.databind;
-    requires com.fasterxml.jackson.datatype.jsr310;
-    requires javax.mail.api;
-    requires quartz;
-    requires com.mailjet.api;
-    requires org.json;
-    requires com.google.zxing;
-    requires com.google.zxing.javase;
+
     exports atlantafx.sampler;
     exports atlantafx.sampler.fake.domain;
     exports atlantafx.sampler.event;
