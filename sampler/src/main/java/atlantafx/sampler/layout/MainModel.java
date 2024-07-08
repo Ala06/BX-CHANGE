@@ -80,7 +80,7 @@ public class MainModel {
         var watchlist = NavTree.Item.page("Watchlist", new FontIcon(Material2OutlinedMZ.PAGES), WatchlistPage.class);
         var events = NavTree.Item.page("Events", new FontIcon(Material2OutlinedMZ.PAGEVIEW), EventsPage.class);
         var UserEvents = NavTree.Item.page("Events", new FontIcon(Material2OutlinedMZ.PAGEVIEW), UserEventsPage.class);
-        var profile = NavTree.Item.page("Profile", new FontIcon(Material2OutlinedMZ.SETTINGS), ProfilePage.class);
+        var xchange = NavTree.Item.page("X-Change", new FontIcon(Material2OutlinedMZ.SETTINGS), XChangePage.class);
 
 
 
@@ -91,7 +91,7 @@ public class MainModel {
                 watchlist,
                 events,
                 UserEvents,
-                profile
+                xchange
         );
 
         return root;
@@ -111,7 +111,7 @@ public class MainModel {
         map.put(EventsPage.class, NavTree.Item.page(EventsPage.NAME, EventsPage.class));
         map.put(UserEventsPage.class, NavTree.Item.page(EventsPage.NAME, UserEventsPage.class));
 
-        map.put(ProfilePage.class, NavTree.Item.page(ProfilePage.NAME, ProfilePage.class));
+        map.put(XChangePage.class, NavTree.Item.page(XChangePage.NAME, XChangePage.class));
 
         return map;
     }

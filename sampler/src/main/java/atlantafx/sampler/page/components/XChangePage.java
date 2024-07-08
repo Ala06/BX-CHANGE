@@ -190,7 +190,7 @@ public class XChangePage extends OutlinePage {
     private final DiscussionService discussionService = new DiscussionServiceImpl();
     private final MessageService messageService = new MessageServiceImpl();
 
-    private final User currentUser = new User(6, "ilhem");
+    private final User currentUser = new User(1, "Alaa");
     private User selectedUser;
     private Discussions currentDiscussion;
 
