@@ -1,7 +1,3 @@
-<<<<<<< Updated upstream
-package atlantafx.sampler.services.serviceImpl;public class UserServiceImpl {
-}
-=======
 package atlantafx.sampler.services.serviceImpl;
 
 import atlantafx.sampler.DBManager;
@@ -117,4 +113,3 @@ public class UserServiceImpl implements UserService {
     }
 
 }
->>>>>>> Stashed changes

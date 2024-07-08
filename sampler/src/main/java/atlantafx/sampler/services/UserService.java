@@ -1,6 +1,4 @@
-<<<<<<< Updated upstream
-package atlantafx.sampler.services;public interface UserService {
-=======
+
 package atlantafx.sampler.services;
 
 import atlantafx.sampler.entities.User;
@@ -20,5 +18,5 @@ public interface UserService {
 
 
     void deleteUser(int userId);
->>>>>>> Stashed changes
+
 }

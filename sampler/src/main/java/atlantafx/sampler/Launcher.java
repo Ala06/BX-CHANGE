@@ -6,12 +6,9 @@ import atlantafx.sampler.event.DefaultEventBus;
 import atlantafx.sampler.event.HotkeyEvent;
 import atlantafx.sampler.event.Listener;
 import atlantafx.sampler.layout.ApplicationWindow;
-<<<<<<< Updated upstream
-import atlantafx.sampler.services.serviceImpl.SchedulerManager;
-=======
 import atlantafx.sampler.page.components.LoginPage;
 import atlantafx.sampler.page.components.SignupPage;
->>>>>>> Stashed changes
+
 import atlantafx.sampler.theme.ThemeManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import fr.brouillard.oss.cssfx.api.URIToPathConverter;
@@ -39,12 +36,8 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
-<<<<<<< Updated upstream
-import org.quartz.SchedulerException;
-=======
 import javafx.scene.layout.VBox;
 import javafx.scene.control.Button;
->>>>>>> Stashed changes
 
 public class Launcher extends Application {
 
@@ -57,15 +50,7 @@ public class Launcher extends Application {
     );
 
     public static void main(String[] args) {
-<<<<<<< Updated upstream
 
-        try {
-            SchedulerManager.startScheduler();
-        } catch (SchedulerException e) {
-            System.out.println(e.getMessage());;
-        }
-=======
->>>>>>> Stashed changes
         launch(args);
 
 

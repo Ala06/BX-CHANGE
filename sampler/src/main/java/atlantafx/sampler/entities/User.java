@@ -1,6 +1,4 @@
-<<<<<<< Updated upstream
-package atlantafx.sampler.entities;public class User {
-=======
+
 package atlantafx.sampler.entities;
 
 public class User {
@@ -51,5 +49,4 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
->>>>>>> Stashed changes
 }

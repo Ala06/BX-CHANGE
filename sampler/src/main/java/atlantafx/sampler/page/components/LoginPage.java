@@ -1,6 +1,4 @@
-<<<<<<< Updated upstream
-package atlantafx.sampler.page.components;public class LoginPage {
-=======
+
 package atlantafx.sampler.page.components;
 
 import atlantafx.sampler.DBManager;
@@ -70,5 +68,4 @@ public class LoginPage {
         }
         return null;
     }
->>>>>>> Stashed changes
 }
