@@ -11,6 +11,9 @@ import atlantafx.sampler.event.HotkeyEvent;
 import atlantafx.sampler.event.Listener;
 import atlantafx.sampler.layout.ApplicationWindow;
 import atlantafx.sampler.services.serviceImpl.SchedulerManager;
+import atlantafx.sampler.page.components.LoginPage;
+import atlantafx.sampler.page.components.SignupPage;
+
 import atlantafx.sampler.theme.ThemeManager;
 import fr.brouillard.oss.cssfx.CSSFX;
 import fr.brouillard.oss.cssfx.api.URIToPathConverter;
@@ -39,6 +42,8 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import org.quartz.SchedulerException;
+import javafx.scene.layout.VBox;
+import javafx.scene.control.Button;
 
 public class Launcher extends Application {
 
@@ -58,6 +63,7 @@ public class Launcher extends Application {
         } catch (SchedulerException e) {
             System.out.println(e.getMessage());;
         }
+
         launch(args);
 
 
