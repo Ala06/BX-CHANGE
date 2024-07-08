@@ -8,35 +8,6 @@ public class Messages {
     private Date date;
     private String content;
 
-    private int discussionId;
-    private int author;
-    private int receiver;
-
-    public int getReceiver() {
-        return receiver;
-    }
-
-    public void setReceiver(int receiver) {
-        this.receiver = receiver;
-    }
-
-    public int getDiscussionId() {
-        return discussionId;
-    }
-
-    public void setDiscussionId(int discussionId) {
-        this.discussionId = discussionId;
-    }
-
-    public int getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(int author) {
-        this.author = author;
-    }
-
-
     public int getMessageId() {
         return messageId;
     }
