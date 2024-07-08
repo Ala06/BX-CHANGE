@@ -3,25 +3,27 @@ package atlantafx.sampler.page.components;
 import atlantafx.base.controls.Card;
 import atlantafx.base.controls.Tile;
 import atlantafx.base.theme.Styles;
-import atlantafx.sampler.Resources;
 import atlantafx.sampler.entities.Event;
 import atlantafx.sampler.page.ExampleBox;
 import atlantafx.sampler.page.OutlinePage;
-
-import atlantafx.sampler.page.Snippet;
 import atlantafx.sampler.services.EventService;
 import atlantafx.sampler.services.serviceImpl.EventServiceImpl;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import org.jetbrains.annotations.Nullable;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -29,9 +31,13 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class EventsPage extends OutlinePage {
@@ -49,6 +55,7 @@ public class EventsPage extends OutlinePage {
         addSection("Search Events", searchField);
         eventCardsBox = createEventCards("");
         addSection("Events", eventCardsBox);
+        addSection("Statistics", createEventsBarChart());
     }
 
     private TextField createSearchField() {
@@ -99,7 +106,6 @@ public class EventsPage extends OutlinePage {
         addButton.setOnAction(e -> {
             boolean isValid = true;
 
-            // Validate title
             if (titleField.getText().isEmpty()) {
                 titleLabel.setText("Title cannot be empty");
                 isValid = false;
@@ -107,7 +113,6 @@ public class EventsPage extends OutlinePage {
                 titleLabel.setText("");
             }
 
-            // Validate description
             if (descriptionField.getText().isEmpty()) {
                 descriptionLabel.setText("Description cannot be empty");
                 isValid = false;
@@ -115,7 +120,6 @@ public class EventsPage extends OutlinePage {
                 descriptionLabel.setText("");
             }
 
-            // Validate date
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
             try {
                 LocalDate localDate = LocalDate.parse(dateField.getText(), formatter);
@@ -125,7 +129,6 @@ public class EventsPage extends OutlinePage {
                 isValid = false;
             }
 
-            // Validate duration (assuming it's an integer)
             try {
                 if (!durationField.getText().matches("\\d+")) {
                     durationLabel.setText("Duration must be a number");
@@ -138,7 +141,6 @@ public class EventsPage extends OutlinePage {
                 isValid = false;
             }
 
-            // Validate image URL (optional)
             if (!imageField.getText().isEmpty() && !isValidURL(imageField.getText())) {
                 imageLabel.setText("Invalid image URL");
                 isValid = false;
@@ -146,7 +148,6 @@ public class EventsPage extends OutlinePage {
                 imageLabel.setText("");
             }
 
-            // If all fields are valid, proceed to add the event
             if (isValid) {
                 Event event = new Event(
                         Date.valueOf(LocalDate.parse(dateField.getText(), formatter)),
@@ -158,7 +159,6 @@ public class EventsPage extends OutlinePage {
                 eventService.addEvent(event);
                 refreshEventCards(searchField.getText());
 
-                // Reset fields and show success message
                 titleField.clear();
                 descriptionField.clear();
                 dateField.clear();
@@ -188,8 +188,6 @@ public class EventsPage extends OutlinePage {
             return false;
         }
     }
-
-
 
     private VBox createEventCards(String filter) {
         VBox vbox = new VBox();
@@ -275,8 +273,8 @@ public class EventsPage extends OutlinePage {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate localDate = LocalDate.parse(event.getDate().toString(), formatter);
-        TextField dateField = new TextField(localDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
-        dateField.setPromptText("Date (DD-MM-YYYY)");
+        TextField dateField = new TextField(localDate.format(formatter));
+        dateField.setPromptText("Date (yyyy-MM-dd)");
 
         TextField durationField = new TextField(String.valueOf(event.getDuration()));
         durationField.setPromptText("Duration");
@@ -284,53 +282,96 @@ public class EventsPage extends OutlinePage {
         TextField imageField = new TextField(event.getImage());
         imageField.setPromptText("Image URL");
 
-        VBox dialogContent = new VBox();
-        dialogContent.setSpacing(10);
-        dialogContent.getChildren().addAll(titleField, descriptionField, dateField, durationField, imageField);
-        dialog.getDialogPane().setContent(dialogContent);
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        dialog.initOwner(getScene().getWindow());
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
 
-        dialog.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) {
-                event.setTitle(titleField.getText());
-                event.setDescription(descriptionField.getText());
+        gridPane.add(new Label("Title:"), 0, 0);
+        gridPane.add(titleField, 1, 0);
+        gridPane.add(new Label("Description:"), 0, 1);
+        gridPane.add(descriptionField, 1, 1);
+        gridPane.add(new Label("Date:"), 0, 2);
+        gridPane.add(dateField, 1, 2);
+        gridPane.add(new Label("Duration:"), 0, 3);
+        gridPane.add(durationField, 1, 3);
+        gridPane.add(new Label("Image URL:"), 0, 4);
+        gridPane.add(imageField, 1, 4);
 
-                DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-                LocalDate newLocalDate = LocalDate.parse(dateField.getText(), inputFormatter);
-                event.setDate(Date.valueOf(newLocalDate));
+        dialog.getDialogPane().setContent(gridPane);
 
-                event.setDuration(Integer.parseInt(durationField.getText()));
-                event.setImage(imageField.getText());
+        ButtonType updateButtonType = new ButtonType("Update", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(updateButtonType, ButtonType.CANCEL);
 
-                eventService.updateEvent(event);
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == updateButtonType) {
+                DateTimeFormatter updateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                Event updatedEvent = new Event(
+                        event.getEventId(),
+                        Date.valueOf(LocalDate.parse(dateField.getText(), updateFormatter)),
+                        titleField.getText(),
+                        descriptionField.getText(),
+                        Integer.parseInt(durationField.getText()),
+                        imageField.getText()
+                );
+                eventService.updateEvent(updatedEvent);
                 refreshEventCards(searchField.getText());
             }
+            return null;
         });
+
+        dialog.showAndWait();
     }
 
     private void refreshEventCards(String filter) {
-        eventCardsBox.getChildren().clear();
-        eventCardsBox.getChildren().add(createEventCards(filter));
+        getChildren().remove(eventCardsBox);
+        eventCardsBox = createEventCards(filter);
+        addSection("Events", eventCardsBox);
     }
+
+
+    private StackPane createEventsBarChart() {
+        final CategoryAxis xAxis = new CategoryAxis();
+        final NumberAxis yAxis = new NumberAxis();
+        xAxis.setLabel("Month");
+        yAxis.setLabel("Number of Events");
+
+        final BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
+        barChart.setTitle("Events per Month");
+        barChart.setMinWidth(600);
+        barChart.setMinHeight(450);
+
+        Map<Integer, Long> eventCounts = new HashMap<>();
+        for (int i = 1; i <= 12; i++) {
+            eventCounts.put(i, 0L);
+        }
+
+        for (Event event : eventService.getAllEvents()) {
+            Date date = (Date) event.getDate();
+            int month = date.getMonth() + 1;
+            eventCounts.put(month, eventCounts.get(month) + 1);
+        }
+
+        // Create a series and add data to it
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        for (int i = 1; i <= 12; i++) {
+            Month month = Month.of(i);
+            long count = eventCounts.get(i);
+            series.getData().add(new XYChart.Data<>(month.name(), count));
+        }
+
+        barChart.getData().add(series);
+
+        StackPane chartContainer = new StackPane();
+        chartContainer.setPadding(new Insets(20, 20, 20, 20));
+        chartContainer.getChildren().add(barChart);
+
+        return chartContainer;
+    }
+
+
 
     @Override
     public String getName() {
         return NAME;
-    }
-
-    @Override
-    public boolean canDisplaySourceCode() {
-        return false;
-    }
-
-    @Override
-    public @Nullable URI getJavadocUri() {
-        return null;
-    }
-
-    @Override
-    protected void onRendered() {
-        super.onRendered();
     }
 }
