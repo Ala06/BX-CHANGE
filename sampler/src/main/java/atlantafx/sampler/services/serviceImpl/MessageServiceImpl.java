@@ -32,7 +32,15 @@ public class MessageServiceImpl implements MessageService {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                Messages message = mapResultSetToMessages(resultSet);
+
+                Messages message = new Messages();
+                message.setMessageId(resultSet.getInt("messageId"));
+                message.setDate(resultSet.getDate("date"));
+                message.setContent(resultSet.getString("content"));
+                message.setDiscussionId(resultSet.getInt("discussionId"));
+                message.setAuthor(resultSet.getInt("author"));
+                message.setReceiver(resultSet.getInt("reciever"));
+
                 messages.add(message);
             }
         } catch (SQLException e) {
@@ -48,16 +56,25 @@ public class MessageServiceImpl implements MessageService {
         return messages.isEmpty() ? null : messages.get(0);
     }
 
+    @Override
+    public List<Messages> getMessagesByDiscussionId(int discussionId) {
+        String sql = "SELECT * FROM messages WHERE discussionId = ?";
+        return getMessagesByQuery(sql, discussionId);
+    }
 
     @Override
     public void addMessage(Messages message) {
-        String sql = "INSERT INTO messages (date, content) VALUES (?, ?)";
+        String sql = "INSERT INTO messages (date, content, discussionId, author,reciever) VALUES (?, ?, ?, ?,?)";
+
 
         try (Connection connection = DBManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-
             preparedStatement.setDate(1, new Date(message.getDate().getTime()));
             preparedStatement.setString(2, message.getContent());
+            preparedStatement.setInt(3, message.getDiscussionId());
+            preparedStatement.setInt(4, message.getAuthor());
+            preparedStatement.setInt(5, message.getReceiver());
+
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
