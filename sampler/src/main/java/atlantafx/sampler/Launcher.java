@@ -44,9 +44,9 @@ public class Launcher extends Application {
     public static final boolean IS_DEV_MODE = true;
 
     public static final List<KeyCodeCombination> SUPPORTED_HOTKEYS = List.of(
-        new KeyCodeCombination(KeyCode.SLASH),
-        new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN),
-        new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN)
+            new KeyCodeCombination(KeyCode.SLASH),
+            new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN),
+            new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN)
     );
 
     public static void main(String[] args) {
@@ -69,8 +69,8 @@ public class Launcher extends Application {
         var root = new ApplicationWindow();
 
         var antialiasing = Platform.isSupported(ConditionalFeature.SCENE3D)
-            ? SceneAntialiasing.BALANCED
-            : SceneAntialiasing.DISABLED;
+                ? SceneAntialiasing.BALANCED
+                : SceneAntialiasing.DISABLED;
         var scene = new Scene(root, ApplicationWindow.MIN_WIDTH + 80, 768, false, antialiasing);
         scene.setOnKeyPressed(this::dispatchHotkeys);
 
@@ -110,11 +110,11 @@ public class Launcher extends Application {
     private void loadApplicationProperties() {
         Properties properties = new Properties();
         try (InputStreamReader in = new InputStreamReader(Resources.getResourceAsStream("application.properties"),
-            UTF_8)) {
+                UTF_8)) {
             properties.load(in);
             properties.forEach((key, value) -> System.setProperty(
-                String.valueOf(key),
-                String.valueOf(value)
+                    String.valueOf(key),
+                    String.valueOf(value)
             ));
         } catch (IOException e) {
             throw new RuntimeException(e);

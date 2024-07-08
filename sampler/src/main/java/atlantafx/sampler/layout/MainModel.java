@@ -40,8 +40,8 @@ public class MainModel {
 
     List<NavTree.Item> findPages(String filter) {
         return NAV_TREE.values().stream()
-            .filter(item -> item.getValue() != null && item.getValue().matches(filter))
-            .toList();
+                .filter(item -> item.getValue() != null && item.getValue().matches(filter))
+                .toList();
     }
 
     public MainModel() {
@@ -86,7 +86,7 @@ public class MainModel {
 
         var root = NavTree.Item.root();
         root.getChildren().setAll(
-            dashboard,
+                dashboard,
                 wallet,
                 watchlist,
                 events,
