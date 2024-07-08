@@ -12,6 +12,7 @@ import atlantafx.sampler.event.Listener;
 import atlantafx.sampler.layout.ApplicationWindow;
 import atlantafx.sampler.services.serviceImpl.SchedulerManager;
 import atlantafx.sampler.page.components.LoginPage;
+import atlantafx.sampler.page.components.SignupPage;
 
 import atlantafx.sampler.theme.ThemeManager;
 import fr.brouillard.oss.cssfx.CSSFX;
