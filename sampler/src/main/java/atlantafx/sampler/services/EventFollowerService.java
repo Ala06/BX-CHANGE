@@ -9,4 +9,5 @@ public interface EventFollowerService {
     EventFollower getEventFollowerById(int eventId, int userId);
     void addEventFollower(EventFollower eventFollower);
     void deleteEventFollower(int eventId, int userId);
+    List<EventFollower> getEventFollowersByEventId(int eventId);
 }

@@ -76,4 +76,13 @@ public class Event {
 
     public Event() {
     }
+
+    public Event(int eventId, Date date, String title, String description, int duration, String image) {
+        this.eventId = eventId;
+        this.date = date;
+        this.title = title;
+        this.description = description;
+        this.duration = duration;
+        this.image = image;
+    }
 }
