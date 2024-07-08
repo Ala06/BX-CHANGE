@@ -47,7 +47,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void addEvent(Event event) {
-        String sql = "INSERT INTO events (date, title, description, duration, image) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO events (date, title, description, duration, image) VALUES (?, ?, ?, ?,?)";
 
         try (Connection connection = DBManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -66,7 +66,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void updateEvent(Event event) {
-        String sql = "UPDATE events SET date = ?, title = ?, description = ?, duration = ?, image = ? WHERE eventId = ?";
+        String sql = "UPDATE events SET date = ?, title = ?, description = ?, duration = ? WHERE eventId = ?";
 
         try (Connection connection = DBManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -75,8 +75,7 @@ public class EventServiceImpl implements EventService {
             preparedStatement.setString(2, event.getTitle());
             preparedStatement.setString(3, event.getDescription());
             preparedStatement.setInt(4, event.getDuration());
-            preparedStatement.setString(5, event.getImage());
-            preparedStatement.setInt(6, event.getEventId());
+            preparedStatement.setInt(5, event.getEventId());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -85,25 +84,17 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void deleteEvent(int eventId) {
-        try (Connection connection = DBManager.getConnection()) {
-            // Step 1: Delete event followers
-            String deleteFollowersSql = "DELETE FROM event_followers WHERE eventId = ?";
-            try (PreparedStatement deleteFollowersStmt = connection.prepareStatement(deleteFollowersSql)) {
-                deleteFollowersStmt.setInt(1, eventId);
-                deleteFollowersStmt.executeUpdate();
-            }
+        String sql = "DELETE FROM events WHERE eventId = ?";
 
-            // Step 2: Delete event
-            String deleteEventSql = "DELETE FROM events WHERE eventId = ?";
-            try (PreparedStatement deleteEventStmt = connection.prepareStatement(deleteEventSql)) {
-                deleteEventStmt.setInt(1, eventId);
-                deleteEventStmt.executeUpdate();
-            }
+        try (Connection connection = DBManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setInt(1, eventId);
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
 
     private Event mapResultSetToEvent(ResultSet resultSet) throws SQLException {
         Event event = new Event();
@@ -114,30 +105,5 @@ public class EventServiceImpl implements EventService {
         event.setDuration(resultSet.getInt("duration"));
         event.setImage(resultSet.getString("image"));
         return event;
-    }
-
-    @Override
-    public List<Event> getEventsByDate(Date date) {
-        List<Event> events = new ArrayList<>();
-        String sql = "SELECT * FROM events WHERE date = ?";
-        try (Connection connection = DBManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setDate(1, date);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                Event event = new Event(
-                        resultSet.getInt("eventId"),
-                        resultSet.getDate("date"),
-                        resultSet.getString("title"),
-                        resultSet.getString("description"),
-                        resultSet.getInt("duration"),
-                        resultSet.getString("image")
-                );
-                events.add(event);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return events;
     }
 }
